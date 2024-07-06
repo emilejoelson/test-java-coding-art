@@ -1,3 +1,5 @@
+-- --------------------------------------------------------------------------------------------------------------
+
 -- 1 -  SQL script for creating the product and category tables.
 CREATE TABLE products (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -29,3 +31,6 @@ VALUES
     (UNHEX(REPLACE(UUID(), '-', '')), 'Electronics', 'Category for electronic products', '2024-07-04T01:34:01.266864', NULL),
     (UNHEX(REPLACE(UUID(), '-', '')), 'Clothing', 'Category for clothing items', '2024-07-04T20:02:56.337673', NULL),
     (UNHEX(REPLACE(UUID(), '-', '')), 'Home Appliances', 'Category for home appliances', '2024-07-07T00:16:53.597229', NULL);
+
+
+-----  - -------------------------------------------------------------------------------------------------------------------------------------------------------------------
