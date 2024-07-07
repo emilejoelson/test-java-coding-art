@@ -185,12 +185,9 @@ public class CategoryServiceTest {
     public void deleteCategory_Success() {
         UUID uuid = UUID.randomUUID();
         Category category = new Category();
-        category.setId(1L);
         category.setUuid(uuid);
-        category.setName("name1");
-        category.setDescription("description1");
-
         when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(category));
+
         when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(false);
 
         assertDoesNotThrow(() -> categoryService.deleteCategory(uuid));
