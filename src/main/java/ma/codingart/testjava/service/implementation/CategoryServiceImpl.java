@@ -102,19 +102,21 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(UUID uuid) throws ElementNotFoundException, ElementIsAssociatedWithException {
-        categoryRepository.isAssociatedWithProduct(uuid).ifPresent(isAssociatedWithProduct->{
+        Category category = categoryRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ElementNotFoundException(
+                        new ElementNotFoundException(),
+                        Constants.NOT_FOUND,
+                        new Object[]{uuid}
+                ));
+
+
+        if (categoryRepository.isAssociatedWithProduct(uuid)) {
             throw new ElementIsAssociatedWithException(
                     new ElementIsAssociatedWithException(),
                     Constants.IS_ASSOCIATED_WITH,
                     new Object[]{uuid.toString()}
             );
-        });
-
-
-        Category category = categoryRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ElementNotFoundException(new ElementNotFoundException(),
-                        Constants.NOT_FOUND,
-                        new Object[]{uuid}));
+        }
 
         categoryRepository.delete(category);
     }

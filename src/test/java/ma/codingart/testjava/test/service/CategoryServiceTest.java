@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -186,11 +187,11 @@ public class CategoryServiceTest {
         Category category = new Category();
         category.setId(1L);
         category.setUuid(uuid);
-        category.setName(name1);
-        category.setDescription(description1);
+        category.setName("name1");
+        category.setDescription("description1");
 
-        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(Optional.empty());
         when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(category));
+        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(false);
 
         assertDoesNotThrow(() -> categoryService.deleteCategory(uuid));
 
@@ -200,8 +201,12 @@ public class CategoryServiceTest {
     @Test
     public void deleteCategory_AssociatedProducts() {
         UUID uuid = UUID.randomUUID();
+        Category category = new Category();
+        category.setUuid(uuid);
+        when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(category));
 
-        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(Optional.of(new Category()));
+        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(true);
+
         ElementIsAssociatedWithException exception = assertThrows(ElementIsAssociatedWithException.class, () -> {
             categoryService.deleteCategory(uuid);
         });
@@ -209,6 +214,7 @@ public class CategoryServiceTest {
         assertEquals(Constants.IS_ASSOCIATED_WITH, exception.getKey());
         assertEquals(uuid.toString(), exception.getArgs()[0].toString());
     }
+
 
     @Test
     public void getAllCategories_Success() {
