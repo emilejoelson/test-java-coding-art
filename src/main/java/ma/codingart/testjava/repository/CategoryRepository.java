@@ -12,5 +12,5 @@ public interface CategoryRepository extends JpaRepository<Category,Long> , JpaSp
     Optional<Category> findByName(String name);
 
     @Query("SELECT c FROM Category c WHERE c.uuid = :categoryUuid AND EXISTS (SELECT p FROM Product p WHERE p.category = c ) ")
-    boolean isAssociatedWithProduct(UUID categoryUuid);
+    Optional<Category> isAssociatedWithProduct(UUID categoryUuid);
 }

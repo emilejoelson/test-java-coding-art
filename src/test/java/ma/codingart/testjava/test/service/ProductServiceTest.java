@@ -76,7 +76,7 @@ public class ProductServiceTest {
     private String productDescription2;
     private Double productPrice1;
     private  Double productPrice2;
-
+    private  Boolean isEnabled ;
     private Product createProduct(Long id, String title, String description, Category category, Double price, Boolean isEnabled) {
         Product product = new Product();
         product.setId(id);
@@ -99,6 +99,7 @@ public class ProductServiceTest {
         productDescription2 = "Update Description";
         productPrice1 = 29.99;
         productPrice2 = 38.8;
+        isEnabled = true;
 
         productDtoRequest = new ProductDtoRequest(
                 productTitle1,
@@ -231,6 +232,50 @@ public class ProductServiceTest {
         });
         assertEquals(Constants.NOT_FOUND, exception.getKey());
         assertEquals(uuid.toString(), exception.getArgs()[0].toString());
+    }
+
+    @Test
+    public void patchProduct_NullDescription() {
+        UUID uuid = UUID.randomUUID();
+        ProductPatchDtoRequest patchDto = new ProductPatchDtoRequest(null, null, null, productPrice2, isEnabled);
+
+        Product existingProduct = new Product();
+        existingProduct.setUuid(uuid);
+
+        String originalDescription = productDescription1;
+        existingProduct.setDescription(originalDescription);
+
+        when(productRepository.findByUuid(uuid)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(existingProduct)).thenReturn(existingProduct);
+
+        ProductDtoResponse patchedProduct = productService.patchProduct(uuid, patchDto);
+
+        assertEquals(uuid, patchedProduct.uuid());
+        assertEquals(originalDescription, patchedProduct.description());
+        assertEquals(productPrice2, patchedProduct.price());
+        assertEquals(isEnabled, patchedProduct.isEnabled());
+    }
+
+    @Test
+    public void patchProduct_NullPrice() {
+        UUID uuid = UUID.randomUUID();
+        ProductPatchDtoRequest patchDto = new ProductPatchDtoRequest(null, productDescription2, null, null, isEnabled);
+
+        Product existingProduct = new Product();
+        existingProduct.setUuid(uuid);
+
+        Double originalPrice =productPrice1 ;
+        existingProduct.setPrice(originalPrice);
+
+        when(productRepository.findByUuid(uuid)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.save(existingProduct)).thenReturn(existingProduct);
+
+        ProductDtoResponse patchedProduct = productService.patchProduct(uuid, patchDto);
+
+        assertEquals(uuid, patchedProduct.uuid());
+        assertEquals(productDescription2, patchedProduct.description());
+        assertEquals(originalPrice, patchedProduct.price());
+        assertEquals(isEnabled, patchedProduct.isEnabled());
     }
 
     @Test

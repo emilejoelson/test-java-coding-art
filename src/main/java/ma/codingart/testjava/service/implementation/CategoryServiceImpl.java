@@ -110,13 +110,11 @@ public class CategoryServiceImpl implements CategoryService {
                 ));
 
 
-        if (categoryRepository.isAssociatedWithProduct(uuid)) {
-            throw new ElementIsAssociatedWithException(
-                    new ElementIsAssociatedWithException(),
-                    Constants.IS_ASSOCIATED_WITH,
-                    new Object[]{uuid.toString()}
-            );
+        categoryRepository.isAssociatedWithProduct(uuid).ifPresent(isAssocated -> {
+            throw  new ElementIsAssociatedWithException(new ElementIsAssociatedWithException(),Constants.IS_ASSOCIATED_WITH,
+                    new Object[]{uuid.toString()});
         }
+       );
 
         categoryRepository.delete(category);
     }

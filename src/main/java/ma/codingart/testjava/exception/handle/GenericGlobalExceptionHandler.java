@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import ma.codingart.testjava.dto.response.ValidationResponse;
 import ma.codingart.testjava.exception.BusinessException;
 import ma.codingart.testjava.exception.ElementAlreadyExistException;
+import ma.codingart.testjava.exception.ElementIsAssociatedWithException;
 import ma.codingart.testjava.exception.ElementNotFoundException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -53,13 +54,17 @@ public class GenericGlobalExceptionHandler extends ResponseEntityExceptionHandle
         return getResponseEntity(NOT_FOUND, e);
     }
 
-
     @ExceptionHandler(value = ElementAlreadyExistException.class)
     @ResponseStatus(FOUND)
     public ResponseEntity<ErrorResponse> handleException(final ElementAlreadyExistException e) {
         return getResponseEntity(FOUND, e);
     }
 
+    @ExceptionHandler(value = ElementIsAssociatedWithException.class)
+    @ResponseStatus(FOUND)
+    public ResponseEntity<ErrorResponse> handleException(final ElementIsAssociatedWithException e) {
+        return getResponseEntity(FOUND, e);
+    }
 
     private ResponseEntity<ErrorResponse> getResponseEntity(final HttpStatus status, final BusinessException e) {
         if (Objects.isNull(e.getKey())) {

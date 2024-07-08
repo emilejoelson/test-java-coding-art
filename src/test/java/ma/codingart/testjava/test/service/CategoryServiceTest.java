@@ -182,16 +182,34 @@ public class CategoryServiceTest {
     }
 
     @Test
+    public void patchCategory_NullDescription() {
+        UUID uuid = UUID.randomUUID();
+        CategoryPatchDtoRequest patchDto = new CategoryPatchDtoRequest(null, null);
+
+        Category existingCategory = new Category();
+        existingCategory.setUuid(uuid);
+        String originalDescription = description1;
+        existingCategory.setDescription(originalDescription);
+
+        when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(existingCategory));
+        when(categoryRepository.save(existingCategory)).thenReturn(existingCategory);
+
+        CategoryDtoResponse patchedCategory = categoryService.patchCategory(uuid, patchDto);
+
+        assertEquals(uuid, patchedCategory.uuid());
+        assertNull(patchedCategory.name());
+        assertEquals(originalDescription, patchedCategory.description());
+        assertNotNull(patchedCategory.baseDto());
+    }
+
+    @Test
     public void deleteCategory_Success() {
         UUID uuid = UUID.randomUUID();
         Category category = new Category();
         category.setUuid(uuid);
+
         when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(category));
-
-        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(false);
-
         assertDoesNotThrow(() -> categoryService.deleteCategory(uuid));
-
         verify(categoryRepository, times(1)).delete(category);
     }
 
@@ -200,10 +218,9 @@ public class CategoryServiceTest {
         UUID uuid = UUID.randomUUID();
         Category category = new Category();
         category.setUuid(uuid);
+
         when(categoryRepository.findByUuid(uuid)).thenReturn(Optional.of(category));
-
-        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(true);
-
+        when(categoryRepository.isAssociatedWithProduct(uuid)).thenReturn(Optional.of(category));
         ElementIsAssociatedWithException exception = assertThrows(ElementIsAssociatedWithException.class, () -> {
             categoryService.deleteCategory(uuid);
         });
@@ -255,5 +272,30 @@ public class CategoryServiceTest {
         assertEquals(0, result.getTotalRecords());
         assertTrue(result.isFirst());
         assertTrue(result.isLast());
+    }
+
+    @Test
+    public void findByName_Success() {
+        Category category = new Category();
+        category.setName(name1);
+
+        when(categoryRepository.findByName(name1)).thenReturn(Optional.of(category));
+
+        Category foundCategory = categoryService.findByName(name1);
+
+        assertNotNull(foundCategory);
+        assertEquals(name1, foundCategory.getName());
+    }
+
+    @Test
+    public void findByName_ElementNotFound() {
+        when(categoryRepository.findByName(name1)).thenReturn(Optional.empty());
+
+        ElementNotFoundException exception = assertThrows(ElementNotFoundException.class, () -> {
+            categoryService.findByName(name1);
+        });
+
+        assertEquals(Constants.NOT_FOUND, exception.getKey());
+        assertEquals(name1, exception.getArgs()[0]);
     }
 }
