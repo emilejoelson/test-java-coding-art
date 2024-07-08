@@ -51,8 +51,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:test.yml")
-@Service
-@RequiredArgsConstructor
 public class ProductServiceTest {
     @Autowired
     private ProductService productService;
